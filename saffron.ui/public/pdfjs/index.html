@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>PDF Fabric Viewer</title>
+  </head>
+  <body>
+    <div class="container">
+      <canvas id="pdf-canvas"></canvas>
+      <canvas id="fabric-canvas"></canvas>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js"></script>
+
+    <script>
+      window.pdfjsLib = window.pdfjsLib || window['pdfjs-dist/build/pdf'];
+      pdfjsLib.GlobalWorkerOptions.workerSrc =
+        'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
+
+    <script>
+      const pdfCanvas = document.getElementById('pdf-canvas');
+      const fabricCanvasElement = document.getElementById('fabric-canvas');
+      const fabricCanvas = new fabric.Canvas('fabric-canvas');
+      let pdfDoc = null;
+
+      function resizeCanvases(width, height) {
+        console.log({ width, height });
+        pdfCanvas.width = width;
+        pdfCanvas.height = height;
+        fabricCanvasElement.width = width;
+        fabricCanvasElement.height = height;
+        fabricCanvas.setWidth(width);
+        fabricCanvas.setHeight(height);
+      }
+
+      function getA4SizePixels() {
+        const inchToPx = 96 * window.devicePixelRatio; // یا دقیق‌تر: تست فیزیکی
+        const widthInPx = 8.27 * inchToPx;
+        const heightInPx = 11.69 * inchToPx;
+        return { widthInPx, heightInPx };
+      }
+
+      function sendToParent(data) {
+        window.parent.postMessage(data, '*'); // ارسال داده به parent
+      }
+
+      async function renderPage(pageNumber) {
+        const { widthInPx, heightInPx } = getA4SizePixels();
+
+        const page = await pdfDoc.getPage(pageNumber);
+        const originalViewport = page.getViewport({ scale: 1 });
+        const scale = widthInPx / originalViewport.width;
+        const viewport = page.getViewport({ scale: scale });
+
+        console.log('Viewport:', viewport.width, viewport.height);
+
+        const pdfRect = page.view; // [xMin, yMin, xMax, yMax]
+        const width = pdfRect[2] - pdfRect[0];
+        const height = pdfRect[3] - pdfRect[1];
+        console.log('Original page size (points):', width, height);
+
+        resizeCanvases(viewport.width, viewport.height);
+        const ctx = pdfCanvas.getContext('2d');
+        ctx.clearRect(0, 0, pdfCanvas.width, pdfCanvas.height);
+        await page.render({ canvasContext: ctx, viewport }).promise;
+        console.log('Rendered page', pageNumber);
+        sendToParent({ msg: 'loaded', data: { pages: pdfDoc.numPages } });
+        // ارسال اطلاعات به parent iframe
+
+        // رویداد انتخاب یک object
+        fabricCanvas.on('object:selected', (event) => {
+          const selectedObject = event.target;
+          const data = {
+            msg: 'selected',
+            data: {
+              id: selected.id || null,
+              left: selected.left,
+              top: selected.top,
+              width: selected.width,
+              height: selected.height,
+            },
+          };
+          sendToParent(data);
+        });
+
+        // رویداد جابجایی یک object
+        fabricCanvas.on('object:moving', (event) => {
+          const movedObject = event.target;
+          const data = {
+            msg: 'moving',
+            data: {
+              id: movedObject.id || null,
+              left: movedObject.left,
+              top: movedObject.top,
+              width: movedObject.width,
+              height: movedObject.height,
+            },
+          };
+          sendToParent(data);
+        });
+
+        // رویداد تغییر اندازه یک object
+        fabricCanvas.on('object:modified', (event) => {
+          const modifiedObject = event.target;
+          const data = {
+            msg: 'modified',
+            data: {
+              id: modifiedObject.id || null,
+              left: modifiedObject.left,
+              top: modifiedObject.top,
+              width: modifiedObject.width,
+              height: modifiedObject.height,
+            },
+          };
+          sendToParent(data);
+        });
+      }
+
+      window.onload = async () => {
+        const loadingTask = pdfjsLib.getDocument('http://localhost:9000/pdfjs/form1.pdf');
+        pdfDoc = await loadingTask.promise;
+        console.log('PDF loaded:', pdfDoc.numPages);
+        renderPage(1);
+      };
+
+      // Dispatcher to handle different messages
+      const messageHandler = {
+        load: () => {
+          console.log('Loading message received');
+          // Handle load logic here
+        },
+
+        addAnnotation: () => {
+          // افزودن یک Textbox به canvas
+          const textbox = new fabric.Textbox('Hello, Fabric!', {
+            left: 100,
+            top: 100,
+            fontSize: 30,
+            fill: 'blue',
+            width: 200, // عرض Textbox
+            textAlign: 'center',
+          });
+
+          // اضافه کردن Textbox به canvas
+          fabricCanvas.add(textbox);
+        },
+
+        deleteAnnotation: () => {
+          console.log('Delete annotation message received');
+          // Handle deletion logic here
+        },
+
+        page: (data) => {
+          console.log('Page message received', data);
+          // Handle page logic here
+        },
+
+        // Default handler for unknown messages
+        unknown: () => {
+          console.log('Unknown message received');
+        },
+
+        handleMessage(msg, data) {
+          // Call the appropriate handler based on the message type
+          if (this[msg]) {
+            this[msg](data);
+          } else {
+            this.unknown();
+          }
+        },
+      };
+
+      window.addEventListener('message', (event) => {
+        const { msg, data } = event.data;
+        messageHandler.handleMessage(msg, data);
+      });
+    </script>
+  </body>
+</html>
+<style>
+  html,
+  body {
+    margin: 0;
+  }
+
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f4f4f4; /* برای زیبایی */
+  }
+  .container {
+    position: relative;
+    display: inline-block;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  #pdf-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  #fabric-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+  }
+</style>
