@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "saffron.api"
+		},
+		{
+			"path": "saffron.ui"
+		},
+		{
+			"path": "."
+		}
+	],
+	"settings": {}
+}

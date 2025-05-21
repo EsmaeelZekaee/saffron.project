@@ -3,11 +3,11 @@ import type { RouteRecordRaw } from 'vue-router';
 const routes: RouteRecordRaw[] = [
   {
     name: 'Forms',
-    path: '/fb',
+    path: '/f',
     component: () => import('layouts/FormBuilder.vue'),
     children: [
       { path: '', component: () => import('pages/FormBuilder/IndexPage.vue') },
-      { path: 'files', component: () => import('pages/FormBuilder/FilesPage.vue') }
+      { name:'Forms-Files', path: 'c/:nodeId?', component: () => import('pages/FormBuilder/FilesPage.vue') }
     ],
 
   },

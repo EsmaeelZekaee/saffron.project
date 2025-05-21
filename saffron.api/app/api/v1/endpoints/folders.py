@@ -18,22 +18,24 @@ def allowed_file(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-
 @router.get("/folders", response_model=dict)
 async def list_folders(
-    
     skip: int = Query(0, ge=0),
-    limit: int = Query(10, gt=0, le=100),
+    limit: int = Query(100, gt=0, le=100),
     db=Depends(get_database),
     username: str = Depends(get_current_username),
 ):
     """List folders with pagination"""
     folders_col = db["folders"]
-    cursor = folders_col.find({"username": username}).skip(skip).limit(limit)
+    cursor = (
+        folders_col.find({"username": username, "is_active":True}, {"is_active": 0, "username": 0})
+        # .skip(skip)
+        # .limit(limit)
+    )
     folders = await cursor.to_list(length=limit)
-    
+
     total = await folders_col.count_documents({"username": username})
-    
+
     return JSONResponse(
         content={
             "message": "User Folders Scanned",
@@ -87,7 +89,7 @@ async def create_folder(
     )
 
 
-@router.delete("/folders", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/folders/{folder_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_folder(
     folder_id: str,
     db=Depends(get_database),

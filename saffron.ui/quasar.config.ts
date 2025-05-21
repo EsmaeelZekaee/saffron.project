@@ -103,10 +103,11 @@ export default defineConfig((ctx) => {
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#framework
     framework: {
-      config: { 
+      config: {
         loadingBar: {
           color: 'primary',
           size: '4px',
+          iconSet: 'mdi-v6',
           position: 'top',
         },
       },
@@ -122,7 +123,7 @@ export default defineConfig((ctx) => {
       // directives: [],
 
       // Quasar plugins
-      plugins: ['LoadingBar','Notify', 'Dialog']
+      plugins: ['LoadingBar', 'Notify', 'Dialog']
     },
     rtlSupport: true,
     // animations: 'all', // --- includes all animations

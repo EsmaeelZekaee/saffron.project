@@ -18,15 +18,6 @@
             class="q-mb-md"
           />
           <q-input
-            v-model="model.email"
-            :label="$t('user.email')"
-            :rules="[rules.required, rules.email]"
-            dense
-            type="email"
-            required
-            class="q-mb-md"
-          />
-          <q-input
             v-model="model.password"
             :label="$t('user.password')"
             :rules="[rules.required]"
@@ -68,11 +59,11 @@ import { useI18n } from 'vue-i18n';
 import { api } from 'src/boot/axios';
 import { Notify } from 'quasar';
 import { useQuasar } from 'quasar';
-const $q = useQuasar()
+const $q = useQuasar();
 export interface Model {
   username: string;
-  email: string;
   password: string;
+  // email: string;
   error: string | null;
 }
 
@@ -81,33 +72,32 @@ const router = useRouter();
 
 const model = ref<Model>({
   username: 'jikal',
-  email: 'jikal@ronak.esi',
   password: 'ronak',
   error: null,
 });
 
 const rules = {
   required: (val: string) => !!val || t('field_required'),
-  email: (val: string) => /.+@.+\..+/.test(val) || t('email_invalid'),
+  // email: (val: string) => /.+@.+\..+/.test(val) || t('email_invalid'),
 };
 
 const isValid = computed(() => {
   return (
     model.value.username &&
-    model.value.email &&
-    /.+@.+\..+/.test(model.value.email) &&
+    // model.value.email &&
+    // /.+@.+\..+/.test(model.value.email) &&
     model.value.password
   );
 });
 
 const handleSignup = async () => {
   model.value.error = null;
-  console.log($q)
-  $q.loadingBar.start()
+  console.log($q);
+  $q.loadingBar.start();
   try {
     await api.post('/auth/register', {
       username: model.value.username,
-      email: model.value.email,
+      // email: model.value.email,
       password: model.value.password,
     });
 
@@ -125,9 +115,8 @@ const handleSignup = async () => {
     } else {
       model.value.error = t('error_generic');
     }
-  }
-  finally{
-    $q.loadingBar.stop()
+  } finally {
+    $q.loadingBar.stop();
   }
 };
 </script>

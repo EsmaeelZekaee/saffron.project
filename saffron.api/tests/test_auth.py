@@ -21,7 +21,7 @@ def test_db():
 
 @pytest.mark.asyncio
 async def test_register_and_login_and_me(test_db):
-    client = AsyncClient(transport=ASGITransport(app=app), base_url="http://test")
+    client = AsyncClient(transport=ASGITransport(app=app), base_url="http://test/auth")
 
     # Override دیتابیس
     db = test_db

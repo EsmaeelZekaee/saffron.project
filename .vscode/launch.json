@@ -1,0 +1,32 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run FastAPI (saffron.api)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/saffron.api/app/main.py",  // change to your entry file
+      "console": "integratedTerminal",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}/saffron.api"
+      }
+    },
+    {
+      "name": "Run Quasar Dev Server (saffron.ui)",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/saffron.ui",
+      "runtimeExecutable": "quasar",
+      "runtimeArgs": [
+        "dev"
+      ],
+      "console": "integratedTerminal"
+    }
+  ],
+  "compounds": [
+    {
+        "name": "Compound",
+        "configurations": ["Run FastAPI (saffron.api)","Run Quasar Dev Server (saffron.ui)"]
+    }
+  ]
+}
