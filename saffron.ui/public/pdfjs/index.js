@@ -5,6 +5,13 @@ export const PDFEditor = {
   pdfCanvas: null,
   fabricCanvas: null,
   fabricCanvasElement: null,
+  generateMongoObjectId() {
+    const timestamp = Math.floor(new Date().getTime() / 1000).toString(16);
+    const random = 'xxxxxxxxxxxxxxxx'.replace(/[x]/g, () =>
+      Math.floor(Math.random() * 16).toString(16),
+    );
+    return timestamp + random;
+  },
 
   init(fabric, pdfjsLib) {
     this.fabric = fabric;
@@ -118,14 +125,16 @@ export const PDFEditor = {
   },
 
   addAnnotation() {
-    const textbox = new this.fabric.Textbox('Hello, Fabric!', {
+    const textbox = new this.fabric.Textbox('Hello, Saffron!', {
       left: 100,
       top: 100,
-      fontSize: 30,
+      fontSize: 14,
       fill: 'blue',
       width: 200,
       textAlign: 'center',
     });
+    const id = this.generateMongoObjectId();
+    textbox.id = id
     this.fabricCanvas.add(textbox);
   },
 

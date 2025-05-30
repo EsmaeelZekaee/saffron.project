@@ -2,8 +2,8 @@
   <q-page class="flex flex-center" padding>
     <q-card class="q-pa-md" style="min-width: 500px; max-width: 400px; width: 100%">
       <q-card-section>
-        <div class="text-h6">{{ t('user.login') }}</div>
-        <div class="text-subtitle2">{{ t('user.loginHint') }}</div>
+        <div class="text-h6">{{ t('user.login.title') }}</div>
+        <div class="text-subtitle2">{{ t('user.login.hint') }}</div>
       </q-card-section>
       <q-separator />
 
@@ -11,14 +11,14 @@
         <q-card-section>
           <q-input
             v-model="model.username"
-            :label="t('user.username')"
+            :label="t('user.fields.username')"
             :rules="[rules.required]"
             required
             dense
           />
           <q-input
             v-model="model.password"
-            :label="t('user.password')"
+            :label="t('user.fields.password')"
             type="password"
             :rules="[rules.required]"
             class="q-mt-md"
@@ -27,11 +27,11 @@
           />
         </q-card-section>
         <q-card-actions align="right">
-          <q-btn :disable="!isValid" type="submit" color="primary" :label="$t('user.login')" />
+          <q-btn :disable="!isValid" type="submit" color="primary" :label="$t('user.login.submit')" />
         </q-card-actions>
       </q-form>
       <router-link to="/auth/signup" class="text-primary text-underline">{{
-        $t('user.signup')
+        $t('user.signup.title')
       }}</router-link>
       &nbsp;&nbsp;|&nbsp;&nbsp;
       <router-link to="/" class="text-primary text-underline">{{ $t('public.home') }}</router-link>
@@ -81,7 +81,7 @@ const handleLogin = async () => {
     userStore.token = res.data.token;
     Notify.create({
       type: 'positive',
-      message: t('user.loginSuccess'),
+      message: t('user.login.success'),
     });
     await router.push({ name: 'Forms' });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

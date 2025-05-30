@@ -2,8 +2,8 @@
   <q-page class="flex flex-center" padding>
     <q-card class="q-pa-md" style="min-width: 500px; max-width: 400px; width: 100%">
       <q-card-section>
-        <div class="text-h6">{{ $t('user.signup') }}</div>
-        <div class="text-subtitle2">{{ $t('user.signupHint') }}</div>
+        <div class="text-h6">{{ $t('user.signup.title') }}</div>
+        <div class="text-subtitle2">{{ $t('user.signup.hint') }}</div>
       </q-card-section>
 
       <q-separator />
@@ -11,7 +11,7 @@
         <q-card-section>
           <q-input
             v-model="model.username"
-            :label="$t('user.username')"
+            :label="$t('user.fields.username')"
             :rules="[rules.required]"
             dense
             required
@@ -19,7 +19,7 @@
           />
           <q-input
             v-model="model.password"
-            :label="$t('user.password')"
+            :label="$t('user.fields.password')"
             :rules="[rules.required]"
             dense
             type="password"
@@ -29,7 +29,7 @@
 
         <q-card-actions align="center">
           <q-btn
-            :label="$t('user.signupSubmit')"
+            :label="$t('user.signup.submit')"
             color="primary"
             type="submit"
             :disable="!isValid"
@@ -44,7 +44,7 @@
         </q-banner>
       </transition>
       <router-link to="/auth/login" class="text-primary text-underline">{{
-        $t('user.login')
+        $t('user.login.title')
       }}</router-link>
       &nbsp;&nbsp;|&nbsp;&nbsp;
       <router-link to="/" class="text-primary text-underline">{{ $t('public.home') }}</router-link>

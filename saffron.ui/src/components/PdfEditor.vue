@@ -51,8 +51,8 @@
       style="height: calc(100vh - 126px); border: 0; margin: 0; padding: 0"
     ></iframe>
     <q-bar dense class="row justify-center items-center gap-2" dir="ltr">
-      <q-btn flat icon="fa-solid fa-backward-step" @click="goToPage((page = 1))" />
-      <q-btn flat icon="fa-solid fa-backward" @click="goToPage((page = page > 1 ? page - 1 : 1))" />
+      <q-btn dense flat icon="fa-solid fa-backward-step" @click="goToPage((page = 1))" />
+      <q-btn dense flat icon="fa-solid fa-angle-left" @click="goToPage((page = page > 1 ? page - 1 : 1))" />
 
       <div class="q-pa-md">
         <div class="cursor-pointer">
@@ -70,10 +70,11 @@
       </div>
       <q-btn
         flat
-        icon="fa-solid fa-forward"
+        dense
+        icon="fa-solid fa-angle-right"
         @click="goToPage((page = page < pages ? page + 1 : pages))"
       />
-      <q-btn flat icon="fa-solid fa-forward-step" @click="goToPage((page = pages))" />
+      <q-btn dense flat icon="fa-solid fa-forward-step" @click="goToPage((page = pages))" />
     </q-bar>
   </div>
   <div v-else style="height: calc(100vh); border: 0; margin: 0; padding: 0">

@@ -105,7 +105,7 @@ export const useFolderStore = defineStore('folder', {
     async ren(name: string): Promise<boolean> {
       if (!this.selectedFolder) {
         this.status = 'fail';
-        this.message = 'folder.not.selected';
+        this.message = 'folders.not.selected';
         return false;
       }
       this.selectedFolder._pending = true;
@@ -129,7 +129,7 @@ export const useFolderStore = defineStore('folder', {
     async del() {
       if (!this.selectedFolder) {
         this.status = 'fail';
-        this.message = 'folder.not.selected';
+        this.message = 'folders.selection.required';
         return false;
       }
       this.selectedFolder._pending = true;
@@ -137,16 +137,18 @@ export const useFolderStore = defineStore('folder', {
       try {
         await api.delete(`/api/v1/folders/${this.selectedFolder.id}`);
         const parent = this.getParent(this.selectedFolder.id)
-        if (parent?.children?.length) parent.children = parent.children.filter(x => x.id !== this.selectedFolder?.id)
-
-        this.selectedFolder = parent;
+        if (parent?.children?.length)
+          parent.children = parent.children.filter(x => x.id !== this.selectedFolder?.id)
+        else
+          this.folders = this.folders.filter(x => x.id !== this.selectedFolder?.id)
+        this.selectedFolder = parent || null;
         this.status = 'success';
-        this.message = 'folder.del.succeed';
+        this.message = 'folders.delete.success';
         return true;
 
       } catch {
         this.status = 'fail';
-        this.message = 'folder.del.failed';
+        this.message = 'folders.delete.failed';
         return false;
 
       }
@@ -155,7 +157,7 @@ export const useFolderStore = defineStore('folder', {
     async createFile(form: FormData) {
       if (!this.selectedFolder) {
         this.status = 'fail';
-        this.message = 'folder.not.selected';
+        this.message = 'folders.selection.required';
         return false;
       }
       try {
@@ -180,11 +182,9 @@ export const useFolderStore = defineStore('folder', {
       }
     },
 
-   
+
     async getSelectedFile() {
       if (!this.selectedFolder) {
-        this.status = 'fail';
-        this.message = 'folder.not.selected';
         return false;
       }
 

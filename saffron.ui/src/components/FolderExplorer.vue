@@ -1,11 +1,12 @@
 <template>
   <div class="column full-height">
-    <q-bar dense>
+    <q-bar >
       <q-space></q-space>
       <q-btn
         class="q-pa-none"
         flat
-        icon="create_new_folder"
+        color="primary"
+        icon="fa-solid fa-file-circle-plus"
         @click.prevent.stop="handleNewFolder"
       ></q-btn>
     </q-bar>
@@ -95,7 +96,7 @@ interface IScope {
   cancel: () => void;
   value: string;
 }
-import { QMenu, QTree, type QTreeNode, useQuasar } from 'quasar';
+import {  QMenu, QTree, type QTreeNode, useQuasar } from 'quasar';
 import { useRouter, useRoute } from 'vue-router';
 
 import { nextTick, onMounted, ref, watch } from 'vue';
@@ -112,6 +113,7 @@ const route = useRoute();
 const selectedKey = ref<string | null>(null);
 const menuRef = ref<QMenu | null>(null);
 const treeRef = ref<QTree | null>(null);
+import { showAsyncConfirm } from 'src/utils/showAsyncConfirm'
 
 const contextMenu = (event: Event, node: QTreeNode) => {
   folderStore.select(node);
@@ -163,20 +165,23 @@ const handleRename = async (scope: IScope) => {
     message: t(folderStore.message),
   });
 };
-const handleDeleteFolder = async () => {
-  await folderStore.del();
-  $q.notify({
-    type: folderStore.status === 'success' ? 'positive' : 'negative',
-    group: false,
-    message: t(folderStore.message),
-  });
+const handleDeleteFolder =  () => {
+  showAsyncConfirm({
+    message: t('folders.delete.confirmation'),
+    onConfirm: async () => {
+        await folderStore.del();
+    },
+    onCancel: () => {
+      console.log('لغو شد')
+    }
+  })
 };
 
 const handelRefresh = async () => {
   await folderStore.list(t('forms.toolbar.title'));
 };
 const handleNewFolder = async () => {
-  await folderStore.make(t('folders.newFolderName'));
+  await folderStore.make(t('folders.default.filename'));
   if (folderStore.status === 'fail')
     $q.notify({
       type: 'negative',
