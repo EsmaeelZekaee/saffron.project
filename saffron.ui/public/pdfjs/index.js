@@ -80,50 +80,69 @@ export const PDFEditor = {
 
   setupFabricEvents() {
     this.fabricCanvas.off(); // Remove previous listeners to avoid duplicates
+    this.registerAllFabricEvents(this.fabricCanvas, this.sendToParent);
+  },
+  registerAllFabricEvents(canvas, sendToParent) {
+    const events = [
+      'object:added',
+      'object:removed',
+      'object:modified',
+      'object:moving',
+      'object:scaling',
+      'object:rotating',
+      'selection:created',
+      'selection:updated',
+      'selection:cleared',
+      'text:changed',
+      'editing:entered',
+      'editing:exited',
+      'mouse:down',
+      'mouse:up',
+      'mouse:move',
+    ];
 
-    this.fabricCanvas.on('object:selected', (event) => {
-      const obj = event.target;
-      this.sendToParent({
-        msg: 'selected',
-        data: {
-          id: obj.id || null,
-          left: obj.left,
-          top: obj.top,
-          width: obj.width,
-          height: obj.height,
-        },
-      });
-    });
+    events.forEach((eventName) => {
+      canvas.on(eventName, (e) => {
+        const target = e?.target;
 
-    this.fabricCanvas.on('object:moving', (event) => {
-      const obj = event.target;
-      this.sendToParent({
-        msg: 'moving',
-        data: {
-          id: obj.id || null,
-          left: obj.left,
-          top: obj.top,
-          width: obj.width,
-          height: obj.height,
-        },
-      });
-    });
+        const base = {
+          page: this.page,
+          id: target?.id ?? null,
+          left: target?.left,
+          top: target?.top,
+          width: target?.width,
+          height: target?.height,
+          angle: target?.angle,
+          scaleX: target?.scaleX,
+          scaleY: target?.scaleY,
+          text: target?.text,
+        };
 
-    this.fabricCanvas.on('object:modified', (event) => {
-      const obj = event.target;
-      this.sendToParent({
-        msg: 'modified',
-        data: {
-          id: obj.id || null,
-          left: obj.left,
-          top: obj.top,
-          width: obj.width,
-          height: obj.height,
-        },
+        const extra = {};
+
+        // Special cases
+        if (eventName === 'selection:created' || eventName === 'selection:updated') {
+          Object.assign(extra, {
+            ids: e?.selected?.map((o) => o.id ?? null) ?? [],
+          });
+        }
+
+        if (eventName.startsWith('mouse:') && e.pointer) {
+          Object.assign(extra, {
+            pointer: { x: e.pointer.x, y: e.pointer.y },
+          });
+        }
+
+        sendToParent({
+          msg: eventName,
+          data: {
+            ...base,
+            ...extra,
+          },
+        });
       });
     });
   },
-
   addAnnotation() {
     const textbox = new this.fabric.Textbox('Hello, Saffron!', {
       left: 100,
@@ -134,10 +153,21 @@ export const PDFEditor = {
       textAlign: 'center',
     });
     const id = this.generateMongoObjectId();
-    textbox.id = id
+    textbox.id = id;
     this.fabricCanvas.add(textbox);
-  },
+    const obj = this.findById(id);
 
+    if (obj) {
+      this.fabricCanvas.setActiveObject(obj);
+      this.fabricCanvas.requestRenderAll();
+      this.fabricCanvas.fire('object:selected', { target: obj });
+    } else {
+      console.log('the object not found!');
+    }
+  },
+  findById(id) {
+    return this.fabricCanvas.getObjects().find((o) => o.id === id);
+  },
   deleteAnnotation() {
     const active = this.fabricCanvas.getActiveObject();
     if (active) {

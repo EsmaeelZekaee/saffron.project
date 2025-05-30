@@ -52,7 +52,12 @@
     ></iframe>
     <q-bar dense class="row justify-center items-center gap-2" dir="ltr">
       <q-btn dense flat icon="fa-solid fa-backward-step" @click="goToPage((page = 1))" />
-      <q-btn dense flat icon="fa-solid fa-angle-left" @click="goToPage((page = page > 1 ? page - 1 : 1))" />
+      <q-btn
+        dense
+        flat
+        icon="fa-solid fa-angle-left"
+        @click="goToPage((page = page > 1 ? page - 1 : 1))"
+      />
 
       <div class="q-pa-md">
         <div class="cursor-pointer">
@@ -87,20 +92,34 @@
 </template>
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import {
-  type LoadPdfEvent,
-  type FabricModifiedEvent,
-  type FabricMovingEvent,
-  type FabricSelectEvent,
-} from 'src/models/events';
+import { type LoadPdfEvent } from 'src/models/events';
 import { type IFileModel } from 'src/stores/folder';
+import { api } from 'src/boot/axios';
+import { useAuthStore } from 'src/stores/auth';
+import { AnnotationType, useAnnotationsStore } from 'src/stores/annotation';
+import { usePageStore } from 'src/stores/page';
+import { useFolderStore } from 'src/stores/folder';
+
+const annotationsStore = useAnnotationsStore();
+
 const props = defineProps<{ file: IFileModel }>();
 const pdfFrame = ref<HTMLIFrameElement | null>(null);
 const pages = ref<number>(0);
-const page = ref<number>(1);
+const pageStore = usePageStore();
+const folderStore = useFolderStore();
 
-import { api } from 'src/boot/axios';
-import { useAuthStore } from 'src/stores/auth';
+const page = computed<number>({
+  get: () => {
+    const fileId = folderStore.selectedFile?._id;
+    if (!fileId) return -1;
+    return pageStore.getPage(fileId);
+  },
+  set: (value: number) => {
+    const fileId = folderStore.selectedFile?._id;
+    if (!fileId) return;
+    pageStore.setPage(fileId, value);
+  },
+});
 
 const authStore = useAuthStore();
 
@@ -139,51 +158,71 @@ function goToPage(pageNumber: number) {
   );
 }
 type MessageHandlerFunction = (data: object) => void;
-
 const messageHandler = () => {
-  const handlers: Record<string, MessageHandlerFunction> = {
-    selected: (data) => {
-      const event = data as FabricSelectEvent;
-      console.log(event);
-    },
-    moving: (data) => {
-      const event = data as FabricMovingEvent;
-      console.log(event);
-    },
-    modified: (data) => {
-      const event = data as FabricModifiedEvent;
-      console.log(event);
-    },
-    loaded: (data) => {
-      const event = data as LoadPdfEvent;
-      pages.value = event.pages;
-      console.log(event);
-    },
-    init: () => {},
-  };
+  const handlers: Record<string, MessageHandlerFunction> = {};
 
-  const unknown: MessageHandlerFunction = () => {
-    console.log('Unknown message received');
-  };
+  const eventNames = [
+    'selected',
+    'modified',
+    'moving',
+    'scaling',
+    'rotating',
+    'added',
+    'removed',
+    'mousedown',
+    'mouseup',
+    'mousewheel',
+    'mouse:move',
+    'mouse:over',
+    'mouse:out',
+    'drop',
+    'dragover',
+    'dblclick',
+    'loaded',
+    'init',
+  ];
 
-  const handleMessage = (msg: string, data: object) => {
-    const handler = handlers[msg] ?? unknown;
-    handler(data);
-  };
+  for (const name of eventNames) {
+    handlers[name] = (data) => {
+      if (!props.file?._id) return;
 
-  return { handleMessage };
+      // Special case for 'loaded' event if needed
+      if (name === 'loaded') {
+        const event = data as LoadPdfEvent;
+        pages.value = event.pages;
+        return;
+      }
+      const obj = data as { id: string; };
+      if (obj.id) {
+        console.log(obj);
+        annotationsStore.upsertAnnotation(props.file._id, page.value, {
+          type: AnnotationType.Text,
+          id: obj.id,
+          data: { ...data },
+        });
+      }
+    };
+  }
+
+  return handlers;
 };
+
+const handlers = messageHandler();
 
 window.addEventListener('message', (event) => {
   // بررسی امنیت منبع
   if (event.origin !== window.origin) {
-    console.error('Received message from an untrusted origin:', window.origin, event.origin);
     return;
   }
-  const { msg, data } = event.data;
-  const handler = messageHandler();
 
-  handler.handleMessage(msg, data);
+  const { msg, data } = event.data;
+
+  const handler = handlers[msg];
+  if (typeof handler === 'function') {
+    handler(data);
+  } else {
+    // TODO
+  }
 });
 </script>
 <style>

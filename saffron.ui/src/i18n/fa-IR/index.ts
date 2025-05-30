@@ -18,7 +18,7 @@ export default {
     },
     delete: {
       success: "پوشه با موفقیت حذف شد.",
-      confirmation:"آیا می‌خواهید این پوشه و تمامی زیر‌ پوشه‌هایش حذف شود؟"
+      confirmation: "آیا می‌خواهید این پوشه و تمامی زیر‌ پوشه‌هایش حذف شود؟"
     },
     selection: {
       required: "پوشه انتخاب نشده است."
@@ -77,6 +77,7 @@ export default {
     settings: "تنظیمات"
   },
   public: {
+    annotations: "فیلد‌ها",
     title: "Saffron",
     user: "کاربر",
     formBuilder: "فرم ساز",
@@ -95,5 +96,29 @@ export default {
   },
   error: {
     generic: "خطایی رخ داده است."
+  },
+  fabricEditor: {
+    title: 'ویژگی‌های آبجکت',
+    left: 'موقعیت افقی (Left)',
+    top: 'موقعیت عمودی (Top)',
+    width: 'عرض',
+    height: 'ارتفاع',
+    scaleX: 'مقیاس افقی (Scale X)',
+    scaleY: 'مقیاس عمودی (Scale Y)',
+    angle: 'زاویه (Angle)',
+    fill: 'رنگ داخلی (Fill)',
+    stroke: 'رنگ خط دور (Stroke)',
+    text: 'متن',
+    fontSize: 'اندازه فونت',
+    textAlign: 'چینش متن',
+    alignLeft: 'چپ‌چین',
+    alignCenter: 'وسط‌چین',
+    alignRight: 'راست‌چین',
+    alignJustify: 'تراز‌شده',
+    visible: 'قابل مشاهده',
+    selectable: 'قابل انتخاب',
+    hasControls: 'دارای کنترل‌ها',
+    hasBorders: 'دارای حاشیه',
+    apply: 'اعمال تغییرات',
   }
 }
