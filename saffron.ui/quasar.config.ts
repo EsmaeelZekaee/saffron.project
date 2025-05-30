@@ -16,7 +16,8 @@ export default defineConfig((ctx) => {
     boot: [
       'i18n',
       'axios',
-      'rtl'
+      'rtl',
+      'directives'
     ],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#css
@@ -28,7 +29,7 @@ export default defineConfig((ctx) => {
     extras: [
       // 'ionicons-v4',
       // 'mdi-v7',
-      // 'fontawesome-v6',
+      'fontawesome-v6',
       // 'eva-icons',
       // 'themify',
       // 'line-awesome',

@@ -2,7 +2,8 @@
 export default {
   field_required: "فیلد ضروری می‌باشد.",
   folders: {
-    name: "پوشه جدید",
+    name: "جدید",
+    new:"جدید",
     nameHint: "نام پوشه را وارد نمایید.",
     creating:"در حال ایجاد",
     create: {
@@ -16,7 +17,7 @@ export default {
       failed: "بارگزاری لیست پوشه‌ها با مشکل روبرو شد."
     },
     newFileName:"بدون عنوان",
-    newFolderName:"پوشه جدید"
+    newFolderName:"جدید"
   },
   user: {
     login: "ورود",
@@ -43,18 +44,31 @@ export default {
     formBuilder: "فرم ساز",
     home: "خانه",
     login: "ورود",
+    edit:"ویرایش",
     start: "شروع کنید",
     cancel: "بستن",
-    approve: "تایید"
+    approve: "تایید",
+    delete:"حذف",
+    refresh:"بروزرسانی",
+    dashboard:"پیش‌خوان"
   },
   index: {
     title: "Saffron"
   },
   error_generic: "خطایی رخ داده است.",
-  forms:
+  file:
   {
+    upload:{
+      hint:"فایل PDF را انتخاب کنید",
+      fail:"بارگذاری با شکست مواجه شد.",
+      duplicated:"فایل تکراری است.",
+    },
+    required:"فایل ضروری است.",
+    title:"عنوان: ",
+    updatedAt:"ویرایش شده در: ",
     toolbar: {
-      title: "فایل‌ها"
+      title: "فرم‌ها",
+      files:"فایل‌ها"
     },
     pdf: {
       editor: {

@@ -1,9 +1,12 @@
-export interface Folder {
+export interface FolderModel {
   id: string;
   name: string;
   parent_id: string;
 }
 
-export interface File {
-  totalCount: number;
+export interface FileModel {
+  id: string;
+  name: string;
+  type: string;
+  folder_id: string;
 }

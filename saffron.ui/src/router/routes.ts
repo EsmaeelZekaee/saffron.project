@@ -7,7 +7,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import('layouts/FormBuilder.vue'),
     children: [
       { path: '', component: () => import('pages/FormBuilder/IndexPage.vue') },
-      { name:'Forms-Files', path: 'c/:nodeId?', component: () => import('pages/FormBuilder/FilesPage.vue') }
+      { name:'Forms-Files', path: 'c/:folderId?', component: () => import('pages/FormBuilder/AnnotationPage.vue') }
     ],
 
   },

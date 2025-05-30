@@ -21,7 +21,7 @@ def allowed_file(filename):
 @router.get("/folders", response_model=dict)
 async def list_folders(
     skip: int = Query(0, ge=0),
-    limit: int = Query(100, gt=0, le=100),
+    limit: int = Query(500, gt=0, le=500),
     db=Depends(get_database),
     username: str = Depends(get_current_username),
 ):
@@ -81,6 +81,7 @@ async def create_folder(
     }
 
     result = await folders_col.insert_one(record)
+
     created = await folders_col.find_one({"_id": result.inserted_id})
 
     return JSONResponse(

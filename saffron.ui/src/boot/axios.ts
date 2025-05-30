@@ -64,9 +64,8 @@ export default defineBoot( ({ app, router }) => {
         localStorage.removeItem('token') // پاک کردن توکن
         await router.push({ name: 'login' }) // ریدایرکت به صفحه ورود
       }
-
-      return  Promise.reject(new Error(error.message || 'Unknown error'));
-
+      // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
+      return Promise.reject(error);
     }
   )
 });
