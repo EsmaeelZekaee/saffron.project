@@ -1,11 +1,10 @@
 import { defineStore } from 'pinia'
 import type { PersistenceOptions } from 'pinia-plugin-persistedstate'
+import { roundNested } from 'src/utils/roundNested';
+import { ref, watch } from 'vue';
+import { useIframeStore } from './Iframe';
+import isEqual from 'fast-deep-equal';
 
-export enum AnnotationType {
-    Text = 'Text',
-    Shape = 'Shape',
-    Rectangle = 'Rectangle'
-}
 export interface FabricEventPayload {
     id?: string;
     type?: string;
@@ -27,14 +26,10 @@ export interface FabricEventPayload {
     hasControls?: boolean;
     hasBorders?: boolean;
 }
-export interface Annotation {
-    id: string;
-    type: AnnotationType;
-    data: FabricEventPayload;
-}
+
 
 export interface PageAnnotations {
-    [pageNumber: number]: Annotation[];
+    [pageNumber: number]: FabricEventPayload[];
 }
 
 export interface FileAnnotationsMap {
@@ -42,25 +37,30 @@ export interface FileAnnotationsMap {
 }
 
 export const useAnnotationsStore = defineStore('annotations', {
-    state: () => ({
-        annotations: {} as FileAnnotationsMap,
-        selected: {} as Annotation
-    }),
+    state: () => {
+        const annotations = ref<FileAnnotationsMap>({})
+        const selected = ref<FabricEventPayload>()
+        const iframeStore = useIframeStore()
+
+        watch(selected, (newValue: FabricEventPayload | undefined, oldValue: FabricEventPayload | undefined) => {
+            if (newValue && isEqual(newValue, oldValue))
+                iframeStore.updateAnnotations(newValue)
+        }, { deep: true })
+
+
+
+        return { annotations, selected }
+    },
     persist: {
         key: 'saffron-annotations',
         storage: localStorage, // no need for custom map conversion
     } as PersistenceOptions,
-    getters:{
-        active:(state)=>{
-            return state.selected
-        }
-    },
     actions: {
-        getAnnotations(fileId: string, page: number): Annotation[] {
+        getAnnotations(fileId: string, page: number): FabricEventPayload[] {
             return this.annotations[fileId]?.[page] ?? [];
         },
 
-        addAnnotation(fileId: string, page: number, annotation: Annotation) {
+        addAnnotation(fileId: string, page: number, annotation: FabricEventPayload) {
             if (!this.annotations[fileId]) {
                 this.annotations[fileId] = {};
             }
@@ -71,7 +71,7 @@ export const useAnnotationsStore = defineStore('annotations', {
             this.selected = annotation;
         },
 
-        updateAnnotation(fileId: string, page: number, updated: Annotation) {
+        updateAnnotation(fileId: string, page: number, updated: FabricEventPayload) {
             const pageAnnotations = this.annotations[fileId]?.[page];
             if (!pageAnnotations) return;
 
@@ -81,7 +81,8 @@ export const useAnnotationsStore = defineStore('annotations', {
                 this.selected = updated;
             }
         },
-        upsertAnnotation(fileId: string, page: number, annotation: Annotation) {
+        upsertAnnotation(fileId: string, page: number, annotation: FabricEventPayload) {
+            annotation = roundNested(annotation)
             if (!this.annotations[fileId]) {
                 this.annotations[fileId] = {};
             }
@@ -92,6 +93,7 @@ export const useAnnotationsStore = defineStore('annotations', {
             const index = this.annotations[fileId][page].findIndex((a: { id: string; }) => a.id === annotation.id);
             if (index !== -1) {
                 // Update
+                annotation = {...this.annotations[fileId][page][index], ...annotation}
                 this.annotations[fileId][page][index] = annotation;
             } else {
                 // Insert

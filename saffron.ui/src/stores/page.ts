@@ -3,12 +3,14 @@ import { defineStore } from 'pinia'
 import type { PersistenceOptions } from 'pinia-plugin-persistedstate'
 
 interface PageState {
-  pages: Record<string, number> // fileId -> pageNumber
+  pages: Record<string, number>, // fileId -> pageNumber
+  totalPages: Record<string, number> // fileId -> pageNumber
 }
 
 export const usePageStore = defineStore('page', {
   state: (): PageState => ({
     pages: {},
+    totalPages:{}
   }),
 
   actions: {
@@ -18,6 +20,14 @@ export const usePageStore = defineStore('page', {
 
     setPage(fileId: string, page: number) {
       this.pages[fileId] = page
+    },
+
+    setTotalPages(fileId: string, pages: number): number {
+      return this.totalPages[fileId] = pages
+    },
+
+    getTotalPage(fileId: string) {
+      return this.totalPages[fileId] ?? 1
     },
   },
 

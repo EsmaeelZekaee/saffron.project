@@ -66,7 +66,6 @@ onMounted(() => {
   treeSize.value = loadSize('treeSize', 50);
 });
 function handleSplitterResize(name: string, newSize: number) {
-  console.log();
   localStorage.setItem(`splitter-size["${name}"]`, newSize.toString());
 }
 </script>

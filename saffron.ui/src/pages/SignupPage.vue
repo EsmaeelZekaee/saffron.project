@@ -92,7 +92,6 @@ const isValid = computed(() => {
 
 const handleSignup = async () => {
   model.value.error = null;
-  console.log($q);
   $q.loadingBar.start();
   try {
     await api.post('/auth/register', {

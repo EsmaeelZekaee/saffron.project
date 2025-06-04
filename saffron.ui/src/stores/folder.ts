@@ -52,7 +52,6 @@ export const useFolderStore = defineStore('folder', {
         })
 
         const parent_id = this.selectedFolder?.id;
-        console.log(parent_id)
         const node = { name: name, parent_id: parent_id };
         const res = await api.post('/api/v1/folders', node);
 
@@ -79,8 +78,7 @@ export const useFolderStore = defineStore('folder', {
     select(node: QTreeNode | null) {
       this.selectedFolder = node;
     },
-    async list(root: string) {
-      console.log(root)
+    async list() {
       const folders = await api
         .get('/api/v1/folders')
         .then((res) => {

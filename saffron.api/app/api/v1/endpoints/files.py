@@ -60,7 +60,7 @@ async def create_file(
     file_contents = file.file.read()
     checksum = hashlib.sha256(file_contents).hexdigest()
     existing_file = await files_col.find_one(
-        {"checksum": checksum, "username": username}
+        {"checksum": checksum, "username": username, }
     )
     if existing_file:
         raise HTTPException(status_code=409, detail="Duplicate file upload detected.")

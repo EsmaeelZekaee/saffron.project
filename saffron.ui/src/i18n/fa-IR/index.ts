@@ -89,7 +89,8 @@ export default {
     approve: "تایید",
     delete: "حذف",
     refresh: "بروزرسانی",
-    dashboard: "پیش‌خوان"
+    dashboard: "پیش‌خوان",
+    ok: 'تأیید',
   },
   index: {
     title: "Saffron"
@@ -111,14 +112,21 @@ export default {
     text: 'متن',
     fontSize: 'اندازه فونت',
     textAlign: 'چینش متن',
-    alignLeft: 'چپ‌چین',
-    alignCenter: 'وسط‌چین',
-    alignRight: 'راست‌چین',
+    alignLeft: 'چپ‌-چین',
+    alignCenter: 'وسط‌-چین',
+    alignRight: 'راست‌-چین',
     alignJustify: 'تراز‌شده',
     visible: 'قابل مشاهده',
     selectable: 'قابل انتخاب',
     hasControls: 'دارای کنترل‌ها',
     hasBorders: 'دارای حاشیه',
     apply: 'اعمال تغییرات',
+  },
+  fabricPropertiesEditor: {
+    general: "عمومی",
+    size: "ابعاد",
+    position: "موقعیت",
+    color: 'رنگ'
   }
+
 }

@@ -172,13 +172,12 @@ const handleDeleteFolder =  () => {
         await folderStore.del();
     },
     onCancel: () => {
-      console.log('لغو شد')
     }
   })
 };
 
 const handelRefresh = async () => {
-  await folderStore.list(t('forms.toolbar.title'));
+  await folderStore.list();
 };
 const handleNewFolder = async () => {
   await folderStore.make(t('folders.default.filename'));
@@ -226,7 +225,7 @@ function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 onMounted(async () => {
-  await folderStore.list(t('forms.toolbar.title'));
+  await folderStore.list();
 });
 </script>
 <style>
